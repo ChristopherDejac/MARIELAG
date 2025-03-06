@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 class Marielag
 {
@@ -10,7 +10,7 @@ class Marielag
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         string username, password;
         double ratePerKWh, currentMonthKWh, previousMonthKWh, currentBill, previousBill;
-
+        Console.Clear();
         // Register a user
         Console.WriteLine(@"
                                                     ======================================================
@@ -45,7 +45,7 @@ class Marielag
             Console.WriteLine("Incorrect login. Exiting program.");
             return;
         }
-
+        Console.Clear();
         // Input rate per kWh
         Console.WriteLine(@"
 ============================================================================================================================================================");
@@ -56,8 +56,8 @@ class Marielag
                                         |  | _ \| || |__| |__  | (_| (_) | .` \__ \ |_| | |\/| |  _/ | |  | | (_) | .` |  |
                                         |  |___/___|____|____|  \___\___/|_|\_|___/\___/|_|  |_|_|   |_| |___\___/|_|\_|  |
                                         |_________________________________________________________________________________|");
-                                                                              
-        
+
+
         Console.Write("\nEnter rate per kWh: ");
         ratePerKWh = Convert.ToDouble(Console.ReadLine());
 
@@ -65,7 +65,7 @@ class Marielag
         Console.Write("Enter kWh consumption for the previous month: ");
         previousMonthKWh = Convert.ToDouble(Console.ReadLine());
         // Calculate the previous Bill
-        
+
         previousBill = previousMonthKWh * ratePerKWh;
         // Total Bill
         Console.WriteLine($"\nPrevious month bill: \u20B1{previousBill:F2}");
@@ -73,7 +73,7 @@ class Marielag
         // Input Current Bill
         Console.Write("Enter kWh consumption for the current month: ");
         currentMonthKWh = Convert.ToDouble(Console.ReadLine());
-       
+
         // Calculate the curent Bill
         currentBill = currentMonthKWh * ratePerKWh;
 
