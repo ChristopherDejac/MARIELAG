@@ -1,6 +1,6 @@
 using System;
 
-class Program
+class MARIELAG
 {
     static string registeredUsername = "";
     static string registeredPassword = "";
