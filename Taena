@@ -1,16 +1,16 @@
 using System;
-using System.Threading;
 
 class Program
 {
     static string registeredUsername = "";
     static string registeredPassword = "";
 
-    static void Main(string[] args)
+    static void Main()
     {
+        Console.OutputEncoding = System.Text.Encoding.UTF8;
         Console.Clear();
 
-        // Menu for registration or login
+        // Menu for login or registration
         ShowMenu();
 
         // Electricity Bill Calculation (moved to a separate function)
@@ -24,17 +24,14 @@ class Program
     {
         while (true)
         {
-            Console.WriteLine("1. Register");
-            Console.WriteLine("2. Login");
+            Console.WriteLine("1. Login");
+            Console.WriteLine("2. Register");
             Console.Write("Choose an option (1 or 2): ");
             string choice = Console.ReadLine();
 
             switch (choice)
             {
                 case "1":
-                    RegisterUser();
-                    break;
-                case "2":
                     if (Login())
                     {
                         // Clear the console after successful login
@@ -46,6 +43,9 @@ class Program
                     {
                         Console.WriteLine("Incorrect login. Please try again.");
                     }
+                    break;
+                case "2":
+                    RegisterUser();
                     break;
                 default:
                     Console.WriteLine("Invalid choice. Please choose 1 or 2.");
@@ -195,13 +195,13 @@ class Program
         }
     }
 
-    // Improved loading screen
+    //Improved loading screen
     static void SimulateLoading()
     {
         Console.Write("Loading");
         for (int i = 0; i < 50; i++)
         {
-            Thread.Sleep(20); // Reduced delay for better UX
+            Thread.Sleep(20); //Reduced delay for better UX
             Console.Write("█");
         }
 
