@@ -10,10 +10,10 @@ class MARIELAG
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         Console.Clear();
 
-        
+
         ShowMenu();
 
-      
+
         CalculateElectricityBill();
 
         Console.WriteLine("\nPress any key to exit...");
@@ -34,9 +34,9 @@ class MARIELAG
                 case "1":
                     if (Login())
                     {
-                        
+
                         Console.Clear();
-                        SimulateLoading();
+                     
                         return;
                     }
                     else
@@ -86,7 +86,7 @@ class MARIELAG
         Console.WriteLine("Registration successful!");
     }
 
-    
+
     static bool Login()
     {
         Console.Clear();
@@ -110,11 +110,11 @@ class MARIELAG
                                                                 Password: ");
         string password = Console.ReadLine();
 
-        
+
         return username == registeredUsername && password == registeredPassword;
     }
 
-    
+
     static void CalculateElectricityBill()
     {
         double ratePerKWh;
@@ -133,7 +133,7 @@ class MARIELAG
                                         |  |___/___|____|____|  \___\___/|_|\_|___/\___/|_|  |_|_|   |_| |___\___/|_|\_|  |
                                          ---------------------------------------------------------------------------------");
 
-        
+
         while (true)
         {
             Console.Write("\nEnter rate per kWh: ");
@@ -154,9 +154,9 @@ class MARIELAG
             Console.WriteLine("Invalid input. Please enter a non-negative number.");
         }
 
-        
+
         previousBill = previousMonthKWh * ratePerKWh;
-        
+
         Console.WriteLine($"\nPrevious month bill: \u20B1{previousBill:F2}");
 
         while (true)
@@ -169,18 +169,18 @@ class MARIELAG
             Console.WriteLine("Invalid input. Please enter a non-negative number.");
         }
 
-        
+
         currentBill = currentMonthKWh * ratePerKWh;
 
-        
+
         Console.WriteLine($"Current month bill: \u20B1{currentBill:F2}");
         Console.WriteLine($"Previous month bill: \u20B1{previousBill:F2}");
 
-        
+
         double difference = currentBill - previousBill;
         Console.WriteLine($"Difference between previous and current month: \u20B1{Math.Abs(difference):F2}");
 
-        
+
         if (currentBill > previousBill)
         {
             Console.WriteLine("The current bill is higher than the previous bill.");
@@ -195,17 +195,6 @@ class MARIELAG
         }
     }
 
-    
-    static void SimulateLoading()
-    {
-        Console.Write("Loading");
-        for (int i = 0; i < 50; i++)
-        {
-            Thread.Sleep(20); //Reduced delay for better UX
-            Console.Write("█");
-        }
 
-        Console.WriteLine("\nLoading complete!");
-        Console.Clear();
-    }
+    
 }
