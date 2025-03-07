@@ -1,6 +1,6 @@
 using System;
 
-class Marielag
+class Program
 {
     static string registeredUsername = "";
     static string registeredPassword = "";
@@ -10,7 +10,7 @@ class Marielag
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         string username, password;
         double ratePerKWh, currentMonthKWh, previousMonthKWh, currentBill, previousBill;
-        Console.Clear();
+
         // Register a user
         Console.WriteLine(@"
                                                     ======================================================
@@ -32,21 +32,22 @@ class Marielag
  | |  \ |___ \__> | .__/  |  |___ |  \ |
  |_____________________________________|");
 
-        Console.Write(" Enter username: ");
+        Console.Write("\n Enter username: ");
         registeredUsername = Console.ReadLine();
-        Console.Write(" Enter password: ");
+        Console.Write("\n Enter password: ");
         registeredPassword = Console.ReadLine();
-        Console.WriteLine("  Registration successful!!");
+        Console.Clear();
+        Console.WriteLine(@"
+                                            Registration successful!!");
+        
 
-        // Login
+        
 
         if (!Login())
         {
             Console.WriteLine("Incorrect login. Exiting program.");
             return;
         }
-        Console.Clear();
-        // Input rate per kWh
         Console.WriteLine(@"
 ============================================================================================================================================================");
 
@@ -57,53 +58,55 @@ class Marielag
                                         |  |___/___|____|____|  \___\___/|_|\_|___/\___/|_|  |_|_|   |_| |___\___/|_|\_|  |
                                         |_________________________________________________________________________________|");
 
-
+        Console.WriteLine("");
+        // Input rate per kWh
         Console.Write("\nEnter rate per kWh: ");
         ratePerKWh = Convert.ToDouble(Console.ReadLine());
 
         // Input previous
-        Console.Write("Enter kWh consumption for the previous month: ");
+        Console.Write("\nEnter kWh consumption for the previous month: ");
         previousMonthKWh = Convert.ToDouble(Console.ReadLine());
-        // Calculate the previous Bill
-
+        // Calculate the previous Bill 
+        
         previousBill = previousMonthKWh * ratePerKWh;
         // Total Bill
-        Console.WriteLine($"\nPrevious month bill: \u20B1{previousBill:F2}");
+        Console.WriteLine($"Previous month bill: \u20B1{previousBill:F2}");
 
         // Input Current Bill
-        Console.Write("Enter kWh consumption for the current month: ");
+        Console.Write("\nEnter kWh consumption for the current month: ");
         currentMonthKWh = Convert.ToDouble(Console.ReadLine());
-
+       
         // Calculate the curent Bill
         currentBill = currentMonthKWh * ratePerKWh;
 
         // Show bills and comparison
-        Console.WriteLine($"Current month bill: \u20B1{currentBill:F2}");
+        Console.WriteLine($"\nCurrent month bill: \u20B1{currentBill:F2}");
         Console.WriteLine($"Previous month bill: \u20B1{previousBill:F2}");
 
         // Calculate the difference between the two bills and remove the negative sign if applicable
         double difference = currentBill - previousBill;
-        Console.WriteLine($"Difference between previous and current month: \u20B1{Math.Abs(difference):F2}");
+        Console.WriteLine($"\nDifference between previous and current month: \u20B1{Math.Abs(difference):F2}");
 
         // Compare bills and show which one is higher
         if (currentBill > previousBill)
         {
-            Console.WriteLine("The current bill is higher than the previous bill.");
+            Console.WriteLine("\nThe current bill is higher than the previous bill.");
         }
         else if (currentBill < previousBill)
         {
-            Console.WriteLine("The current bill is lower than the previous bill.");
+            Console.WriteLine("\nThe current bill is lower than the previous bill.");
         }
         else
         {
-            Console.WriteLine("The current and previous bills are the same.");
+            Console.WriteLine("\nThe current and previous bills are the same.");
         }
 
 
         Console.WriteLine("\nPress any key to exit...");
         Console.ReadKey();
     }
-
+   
+    // Login
     static bool Login()
     {
         Console.WriteLine(@"
@@ -116,19 +119,21 @@ class Marielag
                                                              |    _    ___   ___ ___ _  _     |
                                                              |   | |  / _ \ / __|_ _| \| |    |
                                                              |   | |_| (_) | (_ || || .` |    |
-                                                             |   |____\___/ \___|___|_|\_     |
+                                                             |   |____\___/ \___|___|_|\_|    |
                                                              __________________________________");
-
+        
         Console.Write(@"
                                                                 Username: ");
         string username = Console.ReadLine();
         Console.Write(@"
                                                                 Password: ");
         string password = ReadPassword();
+        Console.Clear();
 
         // Check if username and password match the registered ones
         return username == registeredUsername && password == registeredPassword;
     }
+    // HIde Password
     static string ReadPassword()
     {
         string password = "";
