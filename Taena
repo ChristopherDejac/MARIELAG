@@ -1,6 +1,6 @@
 using System;
 
-class Program
+class MARIELAG
 {
     static string registeredUsername = "";
     static string registeredPassword = "";
@@ -10,10 +10,10 @@ class Program
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         Console.Clear();
 
-        // Menu for login or registration
+        
         ShowMenu();
 
-        // Electricity Bill Calculation (moved to a separate function)
+      
         CalculateElectricityBill();
 
         Console.WriteLine("\nPress any key to exit...");
@@ -34,7 +34,7 @@ class Program
                 case "1":
                     if (Login())
                     {
-                        // Clear the console after successful login
+                        
                         Console.Clear();
                         SimulateLoading();
                         return;
@@ -86,7 +86,7 @@ class Program
         Console.WriteLine("Registration successful!");
     }
 
-    // Separate function for login
+    
     static bool Login()
     {
         Console.Clear();
@@ -110,11 +110,11 @@ class Program
                                                                 Password: ");
         string password = Console.ReadLine();
 
-        // Check if username and password match the registered ones
+        
         return username == registeredUsername && password == registeredPassword;
     }
 
-    // Separate function for electricity bill calculation.  Improved error handling.
+    
     static void CalculateElectricityBill()
     {
         double ratePerKWh;
@@ -133,7 +133,7 @@ class Program
                                         |  |___/___|____|____|  \___\___/|_|\_|___/\___/|_|  |_|_|   |_| |___\___/|_|\_|  |
                                          ---------------------------------------------------------------------------------");
 
-        //Input with error handling
+        
         while (true)
         {
             Console.Write("\nEnter rate per kWh: ");
@@ -154,9 +154,9 @@ class Program
             Console.WriteLine("Invalid input. Please enter a non-negative number.");
         }
 
-        // Calculate the previous Bill
+        
         previousBill = previousMonthKWh * ratePerKWh;
-        // Total Bill
+        
         Console.WriteLine($"\nPrevious month bill: \u20B1{previousBill:F2}");
 
         while (true)
@@ -169,18 +169,18 @@ class Program
             Console.WriteLine("Invalid input. Please enter a non-negative number.");
         }
 
-        // Calculate the curent Bill
+        
         currentBill = currentMonthKWh * ratePerKWh;
 
-        // Show bills and comparison
+        
         Console.WriteLine($"Current month bill: \u20B1{currentBill:F2}");
         Console.WriteLine($"Previous month bill: \u20B1{previousBill:F2}");
 
-        // Calculate the difference between the two bills and remove the negative sign if applicable
+        
         double difference = currentBill - previousBill;
         Console.WriteLine($"Difference between previous and current month: \u20B1{Math.Abs(difference):F2}");
 
-        // Compare bills and show which one is higher
+        
         if (currentBill > previousBill)
         {
             Console.WriteLine("The current bill is higher than the previous bill.");
@@ -195,7 +195,7 @@ class Program
         }
     }
 
-    //Improved loading screen
+    
     static void SimulateLoading()
     {
         Console.Write("Loading");
