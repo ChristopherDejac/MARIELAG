@@ -1,0 +1,23 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v8.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v8.0": {
+      "MARIELAGG/1.0.0": {
+        "runtime": {
+          "MARIELAGG.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "MARIELAGG/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

@@ -1,0 +1,14 @@
+C:\Users\`\source\repos\MARIELAGG\MARIELAGG\bin\Debug\net8.0\MARIELAGG.exe
+C:\Users\`\source\repos\MARIELAGG\MARIELAGG\bin\Debug\net8.0\MARIELAGG.deps.json
+C:\Users\`\source\repos\MARIELAGG\MARIELAGG\bin\Debug\net8.0\MARIELAGG.runtimeconfig.json
+C:\Users\`\source\repos\MARIELAGG\MARIELAGG\bin\Debug\net8.0\MARIELAGG.dll
+C:\Users\`\source\repos\MARIELAGG\MARIELAGG\bin\Debug\net8.0\MARIELAGG.pdb
+C:\Users\`\source\repos\MARIELAGG\MARIELAGG\obj\Debug\net8.0\MARIELAGG.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\`\source\repos\MARIELAGG\MARIELAGG\obj\Debug\net8.0\MARIELAGG.AssemblyInfoInputs.cache
+C:\Users\`\source\repos\MARIELAGG\MARIELAGG\obj\Debug\net8.0\MARIELAGG.AssemblyInfo.cs
+C:\Users\`\source\repos\MARIELAGG\MARIELAGG\obj\Debug\net8.0\MARIELAGG.csproj.CoreCompileInputs.cache
+C:\Users\`\source\repos\MARIELAGG\MARIELAGG\obj\Debug\net8.0\MARIELAGG.dll
+C:\Users\`\source\repos\MARIELAGG\MARIELAGG\obj\Debug\net8.0\refint\MARIELAGG.dll
+C:\Users\`\source\repos\MARIELAGG\MARIELAGG\obj\Debug\net8.0\MARIELAGG.pdb
+C:\Users\`\source\repos\MARIELAGG\MARIELAGG\obj\Debug\net8.0\MARIELAGG.genruntimeconfig.cache
+C:\Users\`\source\repos\MARIELAGG\MARIELAGG\obj\Debug\net8.0\ref\MARIELAGG.dll
