@@ -1,0 +1,14 @@
+C:\Users\`\source\repos\MARIELAG\MARIELAG\bin\Debug\net8.0\MARIELAG.exe
+C:\Users\`\source\repos\MARIELAG\MARIELAG\bin\Debug\net8.0\MARIELAG.deps.json
+C:\Users\`\source\repos\MARIELAG\MARIELAG\bin\Debug\net8.0\MARIELAG.runtimeconfig.json
+C:\Users\`\source\repos\MARIELAG\MARIELAG\bin\Debug\net8.0\MARIELAG.dll
+C:\Users\`\source\repos\MARIELAG\MARIELAG\bin\Debug\net8.0\MARIELAG.pdb
+C:\Users\`\source\repos\MARIELAG\MARIELAG\obj\Debug\net8.0\MARIELAG.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\`\source\repos\MARIELAG\MARIELAG\obj\Debug\net8.0\MARIELAG.AssemblyInfoInputs.cache
+C:\Users\`\source\repos\MARIELAG\MARIELAG\obj\Debug\net8.0\MARIELAG.AssemblyInfo.cs
+C:\Users\`\source\repos\MARIELAG\MARIELAG\obj\Debug\net8.0\MARIELAG.csproj.CoreCompileInputs.cache
+C:\Users\`\source\repos\MARIELAG\MARIELAG\obj\Debug\net8.0\MARIELAG.dll
+C:\Users\`\source\repos\MARIELAG\MARIELAG\obj\Debug\net8.0\refint\MARIELAG.dll
+C:\Users\`\source\repos\MARIELAG\MARIELAG\obj\Debug\net8.0\MARIELAG.pdb
+C:\Users\`\source\repos\MARIELAG\MARIELAG\obj\Debug\net8.0\MARIELAG.genruntimeconfig.cache
+C:\Users\`\source\repos\MARIELAG\MARIELAG\obj\Debug\net8.0\ref\MARIELAG.dll
