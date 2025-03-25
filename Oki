@@ -1,0 +1,17 @@
+using MySql.Data.MySqlClient;
+
+void RegisterUser(string username, string password)
+{
+    string connectionString = "Server=localhost;Database=RestaurantDB;Uid=root;Pwd=your_password;";
+    using (MySqlConnection connection = new MySqlConnection(connectionString))
+    {
+        connection.Open();
+        string query = "INSERT INTO Users (Username, Password) VALUES (@Username, @Password)";
+        using (MySqlCommand command = new MySqlCommand(query, connection))
+        {
+            command.Parameters.AddWithValue("@Username", username);
+            command.Parameters.AddWithValue("@Password", password);
+            command.ExecuteNonQuery();
+        }
+    }
+}
