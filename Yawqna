@@ -1,0 +1,185 @@
+using System;
+using System.Collections.Generic;
+
+namespace RestaurantOrderTracking
+{
+    // User Class
+    class User
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+
+    // Menu Item Class
+    class MenuItem
+    {
+        public string Name { get; set; }
+        public double Price { get; set; }
+    }
+
+    // Order Class
+    class Order
+    {
+        public int OrderId { get; set; }
+        public string CustomerName { get; set; }
+        public List<MenuItem> Items { get; set; }
+        public string Status { get; set; }
+        public string DeliveryPersonnel { get; set; }
+    }
+
+    class Program
+    {
+        static List<User> users = new List<User>();
+        static List<MenuItem> menu = new List<MenuItem>();
+        static List<Order> orders = new List<Order>();
+        static int orderIdCounter = 1;
+
+        static void Main(string[] args)
+        {
+            // Sample Menu Items
+            menu.Add(new MenuItem { Name = "Pizza", Price = 9.99 });
+            menu.Add(new MenuItem { Name = "Burger", Price = 4.99 });
+
+            Console.WriteLine("Welcome to Restaurant Order Tracking System!");
+
+            while (true)
+            {
+                Console.WriteLine("\n1. Register\n2. Login\n3. Exit");
+                Console.Write("Select an option: ");
+                var choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        Register();
+                        break;
+                    case "2":
+                        Login();
+                        break;
+                    case "3":
+                        return;
+                    default:
+                        Console.WriteLine("Invalid option!");
+                        break;
+                }
+            }
+        }
+
+        static void Register()
+        {
+            Console.Write("Enter username: ");
+            var username = Console.ReadLine();
+            Console.Write("Enter password: ");
+            var password = Console.ReadLine();
+
+            users.Add(new User { Username = username, Password = password });
+            Console.WriteLine("Registration successful!");
+        }
+
+        static void Login()
+        {
+            Console.Write("Enter username: ");
+            var username = Console.ReadLine();
+            Console.Write("Enter password: ");
+            var password = Console.ReadLine();
+
+            var user = users.Find(u => u.Username == username && u.Password == password);
+            if (user != null)
+            {
+                Console.WriteLine($"Welcome, {username}!");
+                UserMenu();
+            }
+            else
+            {
+                Console.WriteLine("Invalid username or password.");
+            }
+        }
+
+        static void UserMenu()
+        {
+            while (true)
+            {
+                Console.WriteLine("\n1. View Menu\n2. Place Order\n3. View Orders\n4. Logout");
+                Console.Write("Select an option: ");
+                var choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        ViewMenu();
+                        break;
+                    case "2":
+                        PlaceOrder();
+                        break;
+                    case "3":
+                        ViewOrders();
+                        break;
+                    case "4":
+                        return;
+                    default:
+                        Console.WriteLine("Invalid option!");
+                        break;
+                }
+            }
+        }
+
+        static void ViewMenu()
+        {
+            Console.WriteLine("\nRestaurant Menu:");
+            foreach (var item in menu)
+            {
+                Console.WriteLine($"{item.Name} - ${item.Price}");
+            }
+        }
+
+        static void PlaceOrder()
+        {
+            Console.Write("Enter customer name: ");
+            var customerName = Console.ReadLine();
+
+            var orderItems = new List<MenuItem>();
+            while (true)
+            {
+                Console.WriteLine("\nEnter the name of the menu item to add (or type 'done' to finish):");
+                var itemName = Console.ReadLine();
+                if (itemName.ToLower() == "done") break;
+
+                var item = menu.Find(i => i.Name.Equals(itemName, StringComparison.OrdinalIgnoreCase));
+                if (item != null)
+                {
+                    orderItems.Add(item);
+                    Console.WriteLine($"{item.Name} added to the order.");
+                }
+                else
+                {
+                    Console.WriteLine("Item not found.");
+                }
+            }
+
+            orders.Add(new Order
+            {
+                OrderId = orderIdCounter++,
+                CustomerName = customerName,
+                Items = orderItems,
+                Status = "Pending",
+                DeliveryPersonnel = "Unassigned"
+            });
+
+            Console.WriteLine("Order placed successfully!");
+        }
+
+        static void ViewOrders()
+        {
+            Console.WriteLine("\nOrders:");
+            foreach (var order in orders)
+            {
+                Console.WriteLine($"\nOrder ID: {order.OrderId}\nCustomer: {order.CustomerName}\nStatus: {order.Status}\nDelivery Personnel: {order.DeliveryPersonnel}");
+                Console.WriteLine("Items:");
+                foreach (var item in order.Items)
+                {
+                    Console.WriteLine($"- {item.Name} (${item.Price})");
+                }
+            }
+        }
+    }
+}
