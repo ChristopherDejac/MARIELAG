@@ -1,0 +1,103 @@
+  ‎string connectionString = "Server=localhost;Database=RestaurantDB;Uid=root;Pwd=;";
+‎
+‎
+‎
+‎
+‎
+‎static void Register()
+‎{
+‎    Console.Write("Enter username: ");
+‎    var username = Console.ReadLine();
+‎    Console.Write("Enter password: ");
+‎    var password = Console.ReadLine();
+‎
+‎    using (var connection = new MySqlConnection(connectionString))
+‎    {
+‎        connection.Open();
+‎        var query = "INSERT INTO Users (Username, Password) VALUES (@username, @password)";
+‎        var command = new MySqlCommand(query, connection);
+‎        command.Parameters.AddWithValue("@username", username);
+‎        command.Parameters.AddWithValue("@password", password);
+‎
+‎        command.ExecuteNonQuery();
+‎    }
+‎    Console.WriteLine("Registration successful!");
+‎}
+‎
+‎
+‎
+‎static void ViewMenu()
+‎{
+‎    using (var connection = new MySqlConnection(connectionString))
+‎    {
+‎        connection.Open();
+‎        var query = "SELECT Name, Price FROM MenuItems";
+‎        var command = new MySqlCommand(query, connection);
+‎        var reader = command.ExecuteReader();
+‎
+‎        Console.WriteLine("\nRestaurant Menu:");
+‎        while (reader.Read())
+‎        {
+‎            Console.WriteLine($"{reader["Name"]} - ${reader["Price"]}");
+‎        }
+‎    }
+‎}
+‎
+‎
+‎
+‎static void PlaceOrder()
+‎{
+‎    Console.Write("Enter customer name: ");
+‎    var customerName = Console.ReadLine();
+‎
+‎    using (var connection = new MySqlConnection(connectionString))
+‎    {
+‎        connection.Open();
+‎
+‎        // Insert Order
+‎        var insertOrderQuery = "INSERT INTO Orders (CustomerName, Status, DeliveryPersonnel) VALUES (@customerName, 'Pending', 'Unassigned')";
+‎        var orderCommand = new MySqlCommand(insertOrderQuery, connection);
+‎        orderCommand.Parameters.AddWithValue("@customerName", customerName);
+‎        orderCommand.ExecuteNonQuery();
+‎
+‎        // Retrieve OrderId
+‎        var orderId = (int)orderCommand.LastInsertedId;
+‎
+‎        // Insert Order Items
+‎        while (true)
+‎        {
+‎            Console.WriteLine("\nEnter the name of the menu item to add (or type 'done' to finish):");
+‎            var itemName = Console.ReadLine();
+‎            if (itemName.ToLower() == "done") break;
+‎
+‎            var query = "SELECT * FROM MenuItems WHERE Name = @itemName";
+‎            var command = new MySqlCommand(query, connection);
+‎            command.Parameters.AddWithValue("@itemName", itemName);
+‎
+‎            using (var reader = command.ExecuteReader())
+‎            {
+‎                if (reader.Read())
+‎                {
+‎                    var menuItemName = reader["Name"].ToString();
+‎                    var price = Convert.ToDecimal(reader["Price"]);
+‎
+‎                    // Add Order Item
+‎                    var insertItemQuery = "INSERT INTO OrderItems (OrderId, MenuItemName, Price) VALUES (@orderId, @menuItemName, @price)";
+‎                    var itemCommand = new MySqlCommand(insertItemQuery, connection);
+‎                    itemCommand.Parameters.AddWithValue("@orderId", orderId);
+‎                    itemCommand.Parameters.AddWithValue("@menuItemName", menuItemName);
+‎                    itemCommand.Parameters.AddWithValue("@price", price);
+‎
+‎                    itemCommand.ExecuteNonQuery();
+‎                    Console.WriteLine($"{menuItemName} added to the order.");
+‎                }
+‎                else
+‎                {
+‎                    Console.WriteLine("Item not found.");
+‎                }
+‎            }
+‎        }
+‎        Console.WriteLine("Order placed successfully!");
+‎    }
+‎}
+‎
