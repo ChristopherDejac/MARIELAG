@@ -1,0 +1,205 @@
+   using System;
+using System.Collections.Generic;
+
+namespace RestaurantOrderTracking
+{
+    // Menu Item Class
+    class MenuItem
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Category { get; set; } // e.g., Food, Beverage, Dessert
+        public double Price { get; set; }
+    }
+
+    // Order Class
+    class Order
+    {
+        public int OrderId { get; set; }
+        public string CustomerName { get; set; }
+        public List<MenuItem> Items { get; set; }
+        public string Status { get; set; } // Pending, Preparing, Out for Delivery, Delivered
+        public string DeliveryPersonnel { get; set; }
+    }
+
+    class Program
+    {
+        static List<MenuItem> menu = new List<MenuItem>(); // Acts as the database
+        static List<Order> orders = new List<Order>();
+        static List<string> riders = new List<string> { "Rider1", "Rider2", "Rider3" }; // Sample delivery personnel
+        static int orderIdCounter = 1;
+
+        static void Main(string[] args)
+        {
+            // Seed sample menu
+            SeedMenu();
+
+            Console.WriteLine("Welcome to Restaurant Order Tracking System!");
+
+            while (true)
+            {
+                Console.WriteLine("\n1. View Menu\n2. Place Order\n3. Dispatch Assign Order\n4. Rider View Assigned Orders\n5. Update Order Status\n6. Exit");
+                Console.Write("Select an option: ");
+                var choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        ViewMenu();
+                        break;
+                    case "2":
+                        PlaceOrder();
+                        break;
+                    case "3":
+                        DispatchAssignOrder();
+                        break;
+                    case "4":
+                        RiderViewAssignedOrders();
+                        break;
+                    case "5":
+                        UpdateOrderStatus();
+                        break;
+                    case "6":
+                        return;
+                    default:
+                        Console.WriteLine("Invalid option!");
+                        break;
+                }
+            }
+        }
+
+        static void SeedMenu()
+        {
+            menu.Add(new MenuItem { Id = 1, Name = "Pizza", Category = "Food", Price = 9.99 });
+            menu.Add(new MenuItem { Id = 2, Name = "Burger", Category = "Food", Price = 4.99 });
+            menu.Add(new MenuItem { Id = 3, Name = "Coke", Category = "Beverage", Price = 1.99 });
+        }
+
+        static void ViewMenu()
+        {
+            Console.WriteLine("\nRestaurant Menu:");
+            foreach (var item in menu)
+            {
+                Console.WriteLine($"ID: {item.Id}, {item.Name} ({item.Category}) - ${item.Price}");
+            }
+        }
+
+        static void PlaceOrder()
+        {
+            Console.Write("Enter customer name: ");
+            var customerName = Console.ReadLine();
+
+            var orderItems = new List<MenuItem>();
+            while (true)
+            {
+                Console.WriteLine("Enter the ID of the menu item to add (or type '0' to finish):");
+                if (!int.TryParse(Console.ReadLine(), out int itemId) || itemId == 0) break;
+
+                var item = menu.Find(i => i.Id == itemId);
+                if (item != null)
+                {
+                    orderItems.Add(item);
+                    Console.WriteLine($"{item.Name} added to the order.");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid item ID!");
+                }
+            }
+
+            orders.Add(new Order
+            {
+                OrderId = orderIdCounter++,
+                CustomerName = customerName,
+                Items = orderItems,
+                Status = "Pending",
+                DeliveryPersonnel = "Unassigned"
+            });
+
+            Console.WriteLine("Order placed successfully!");
+        }
+
+        static void DispatchAssignOrder()
+        {
+            Console.Write("Enter Order ID to assign: ");
+            if (int.TryParse(Console.ReadLine(), out int orderId))
+            {
+                var order = orders.Find(o => o.OrderId == orderId && o.Status == "Pending");
+                if (order != null)
+                {
+                    Console.Write("Enter Delivery Personnel Name: ");
+                    var personnel = Console.ReadLine();
+                    if (riders.Contains(personnel))
+                    {
+                        order.DeliveryPersonnel = personnel;
+                        order.Status = "Preparing";
+                        Console.WriteLine($"Order ID {orderId} has been assigned to {personnel}.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid Rider Name!");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Order not found or not in Pending status.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid Order ID!");
+            }
+        }
+
+        static void RiderViewAssignedOrders()
+        {
+            Console.Write("Enter your name (Rider): ");
+            var riderName = Console.ReadLine();
+
+            if (riders.Contains(riderName))
+            {
+                var assignedOrders = orders.FindAll(o => o.DeliveryPersonnel == riderName);
+                Console.WriteLine($"\nOrders assigned to {riderName}:");
+                foreach (var order in assignedOrders)
+                {
+                    Console.WriteLine($"Order ID: {order.OrderId}, Customer: {order.CustomerName}, Status: {order.Status}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Rider not found!");
+            }
+        }
+
+        static void UpdateOrderStatus()
+        {
+            Console.Write("Enter Order ID to update: ");
+            if (int.TryParse(Console.ReadLine(), out int orderId))
+            {
+                var order = orders.Find(o => o.OrderId == orderId);
+                if (order != null)
+                {
+                    Console.Write("Enter new status (Preparing, Out for Delivery, Delivered): ");
+                    var status = Console.ReadLine();
+                    if (new[] { "Preparing", "Out for Delivery", "Delivered" }.Contains(status))
+                    {
+                        order.Status = status;
+                        Console.WriteLine($"Order ID {orderId} status updated to {status}.");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid status!");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Order not found!");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid Order ID!");
+            }
+        }
+    }
+}
