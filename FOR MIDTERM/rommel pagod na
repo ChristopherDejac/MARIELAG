@@ -1,0 +1,238 @@
+using System;
+using System.Collections.Generic;
+using System.Net.Mail;
+using System.Net;
+
+class Program
+{
+    static List<User> users = new List<User>();
+    static List<Order> orders = new List<Order>();
+
+    static void Main()
+    {
+        while (true)
+        {
+            Console.WriteLine("Choose an option: 1. Register  2. Login  3. Exit");
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    Register();
+                    break;
+                case "2":
+                    Login();
+                    break;
+                case "3":
+                    return;
+                default:
+                    Console.WriteLine("Invalid choice. Try again.");
+                    break;
+            }
+        }
+    }
+
+    static void Register()
+    {
+        Console.Write("Enter username: ");
+        string username = Console.ReadLine();
+
+        if (users.Exists(u => u.Username == username))
+        {
+            Console.WriteLine("Username already exists. Try another.");
+            return;
+        }
+
+        Console.Write("Enter password: ");
+        string password = Console.ReadLine();
+
+        Console.Write("Enter your Gmail: ");
+        string email = Console.ReadLine();
+
+        Console.Write("Enter your address: ");
+        string address = Console.ReadLine();
+
+        Console.WriteLine("Select role: 1. Customer  2. Rider  3. Dispatch");
+        string roleChoice = Console.ReadLine();
+
+        string role = roleChoice switch
+        {
+            "1" => "Customer",
+            "2" => "Rider",
+            "3" => "Dispatch",
+            _ => null
+        };
+
+        if (role == null)
+        {
+            Console.WriteLine("Invalid role selection. Registration failed.");
+            return;
+        }
+
+        users.Add(new User(username, password, email, address, role));
+        SendRegistrationEmail(email);
+        Console.WriteLine("Registration successful! A notification email has been sent.");
+    }
+
+    static void Login()
+    {
+        Console.Write("Enter username: ");
+        string username = Console.ReadLine();
+
+        Console.Write("Enter password: ");
+        string password = Console.ReadLine();
+
+        User user = users.Find(u => u.Username == username && u.Password == password);
+
+        if (user != null)
+        {
+            Console.WriteLine($"Login successful! Welcome {user.Role}, {user.Username}.");
+            if (user.Role == "Customer")
+            {
+                CustomerDashboard(user);
+            }
+        }
+        else
+        {
+            Console.WriteLine("Invalid username or password.");
+        }
+    }
+
+    static void CustomerDashboard(User customer)
+    {
+        while (true)
+        {
+            Console.WriteLine("Customer Dashboard:");
+            Console.WriteLine("1. View Menu");
+            Console.WriteLine("2. Place an Order");
+            Console.WriteLine("3. Status of the Order");
+            Console.WriteLine("4. Track the Order");
+            Console.WriteLine("5. Logout");
+
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    ViewMenu();
+                    break;
+                case "2":
+                    PlaceOrder(customer);
+                    break;
+                case "3":
+                    OrderStatus(customer);
+                    break;
+                case "4":
+                    TrackOrder(customer);
+                    break;
+                case "5":
+                    return;
+                default:
+                    Console.WriteLine("Invalid choice. Try again.");
+                    break;
+            }
+        }
+    }
+
+    static void ViewMenu()
+    {
+        Console.WriteLine("Appetizer:");
+        Console.WriteLine("1. Lumpia - 15 pesos");
+        Console.WriteLine("2. Kinilaw - 40 pesos");
+        Console.WriteLine("3. Baked Tahong - 100 pesos");
+        Console.WriteLine("Main Dish:");
+        Console.WriteLine("4. Adobo - 60 pesos");
+        Console.WriteLine("5. Sinigang na Baboy - 75 pesos");
+        Console.WriteLine("6. Lechon Kawali - 110 pesos");
+        Console.WriteLine("Dessert:");
+        Console.WriteLine("7. Leche Flan - 60 pesos");
+        Console.WriteLine("8. Ice Cream - 50 pesos");
+        Console.WriteLine("9. Halo-Halo - 90 pesos");
+        Console.WriteLine("Beverages:");
+        Console.WriteLine("10. Buko Juice - 60 pesos");
+        Console.WriteLine("11. Calamansi Juice - 60 pesos");
+        Console.WriteLine("12. Sago't Gulaman - 40 pesos");
+    }
+
+    static void PlaceOrder(User customer)
+    {
+        Console.WriteLine($"Your registered address: {customer.Address}");
+
+        Console.WriteLine("Select item number to order (or type 'done' to finish):");
+        double total = 0;
+        while (true)
+        {
+            string input = Console.ReadLine();
+            if (input.ToLower() == "done") break;
+
+            int item;
+            if (int.TryParse(input, out item) && item >= 1 && item <= 12)
+            {
+                double[] prices = { 15, 40, 100, 60, 75, 110, 60, 50, 90, 60, 60, 40 };
+                total += prices[item - 1];
+                Console.WriteLine($"Item added! Current total: {total} pesos");
+            }
+            else
+            {
+                Console.WriteLine("Invalid selection. Try again.");
+            }
+        }
+        orders.Add(new Order(customer.Username, "Processing", customer.Address));
+        Console.WriteLine($"Order placed! Total: {total} pesos");
+    }
+
+    static void OrderStatus(User customer)
+    {
+        var order = orders.Find(o => o.CustomerName == customer.Username);
+        if (order != null)
+        {
+            Console.WriteLine($"Your order status: {order.Status}");
+        }
+        else
+        {
+            Console.WriteLine("No orders found.");
+        }
+    }
+
+    static void TrackOrder(User customer)
+    {
+        Console.WriteLine("Tracking your order...");
+    }
+
+    static void SendRegistrationEmail(string email)
+    {
+        Console.WriteLine("Registration email sent.");
+    }
+}
+
+class User
+{
+    public string Username { get; }
+    public string Password { get; }
+    public string Email { get; }
+    public string Address { get; }
+    public string Role { get; }
+
+    public User(string username, string password, string email, string address, string role)
+    {
+        Username = username;
+        Password = password;
+        Email = email;
+        Address = address;
+        Role = role;
+    }
+}
+
+class Order
+{
+    public string CustomerName { get; }
+    public string Status { get; set; }
+    public string Address { get; }
+
+    public Order(string customerName, string status, string address)
+    {
+        CustomerName = customerName;
+        Status = status;
+        Address = address;
+    }
+}
