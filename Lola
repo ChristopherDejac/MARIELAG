@@ -1,0 +1,311 @@
+ using System;
+using System.Collections.Generic;
+
+namespace RestaurantOrderTracking
+{
+    // User Class
+    class User
+    {
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public string Email { get; set; }
+        public string Role { get; set; } // Customer, Rider, Dispatch
+    }
+
+    // Menu Item Class
+    class MenuItem
+    {
+        public string Name { get; set; }
+        public string Category { get; set; } // e.g., Food, Beverage, Dessert
+        public double Price { get; set; }
+    }
+
+    // Order Class
+    class Order
+    {
+        public int OrderId { get; set; }
+        public string CustomerName { get; set; }
+        public List<MenuItem> Items { get; set; }
+        public string Status { get; set; } // Pending, Preparing, Delivered
+        public string DeliveryPersonnel { get; set; }
+    }
+
+    class Program
+    {
+        static List<User> users = new List<User>();
+        static List<MenuItem> menu = new List<MenuItem>();
+        static List<Order> orders = new List<Order>();
+        static int orderIdCounter = 1;
+
+        static void Main(string[] args)
+        {
+            // Sample Menu Items
+            menu.Add(new MenuItem { Name = "Pizza", Category = "Food", Price = 9.99 });
+            menu.Add(new MenuItem { Name = "Burger", Category = "Food", Price = 4.99 });
+            menu.Add(new MenuItem { Name = "Coke", Category = "Beverage", Price = 1.99 });
+
+            Console.WriteLine("Welcome to Restaurant Order Tracking System!");
+
+            while (true)
+            {
+                Console.WriteLine("\n1. Register\n2. Login\n3. Exit");
+                Console.Write("Select an option: ");
+                var choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        Register();
+                        break;
+                    case "2":
+                        Login();
+                        break;
+                    case "3":
+                        return;
+                    default:
+                        Console.WriteLine("Invalid option!");
+                        break;
+                }
+            }
+        }
+
+        static void Register()
+        {
+            Console.Write("Enter username: ");
+            var username = Console.ReadLine();
+            Console.Write("Enter password: ");
+            var password = Console.ReadLine();
+            Console.Write("Enter email: ");
+            var email = Console.ReadLine();
+            Console.Write("Enter role (Customer/Rider/Dispatch): ");
+            var role = Console.ReadLine();
+
+            users.Add(new User { Username = username, Password = password, Email = email, Role = role });
+            Console.WriteLine("Registration successful!");
+            Console.WriteLine($"Email sent to {email}: Welcome to the system, {username}!");
+        }
+
+        static void Login()
+        {
+            Console.Write("Enter username: ");
+            var username = Console.ReadLine();
+            Console.Write("Enter password: ");
+            var password = Console.ReadLine();
+
+            var user = users.Find(u => u.Username == username && u.Password == password);
+            if (user != null)
+            {
+                Console.WriteLine($"Welcome, {username}!");
+                Console.WriteLine($"Email sent to {user.Email}: Login successful.");
+                UserMenu(user);
+            }
+            else
+            {
+                Console.WriteLine("Invalid username or password.");
+            }
+        }
+
+        static void UserMenu(User user)
+        {
+            switch (user.Role)
+            {
+                case "Customer":
+                    CustomerMenu(user);
+                    break;
+                case "Rider":
+                    RiderMenu(user);
+                    break;
+                case "Dispatch":
+                    DispatchMenu(user);
+                    break;
+                default:
+                    Console.WriteLine("Invalid role.");
+                    break;
+            }
+        }
+
+        static void CustomerMenu(User user)
+        {
+            while (true)
+            {
+                Console.WriteLine("\n1. View Menu\n2. Place Order\n3. Track Order\n4. Logout");
+                Console.Write("Select an option: ");
+                var choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        ViewMenu();
+                        break;
+                    case "2":
+                        PlaceOrder(user.Username);
+                        break;
+                    case "3":
+                        TrackOrder(user.Username);
+                        break;
+                    case "4":
+                        return;
+                    default:
+                        Console.WriteLine("Invalid option!");
+                        break;
+                }
+            }
+        }
+
+        static void RiderMenu(User user)
+        {
+            while (true)
+            {
+                Console.WriteLine("\n1. Set Availability\n2. View Assigned Orders\n3. Logout");
+                Console.Write("Select an option: ");
+                var choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        SetAvailability(user.Username);
+                        break;
+                    case "2":
+                        ViewAssignedOrders(user.Username);
+                        break;
+                    case "3":
+                        return;
+                    default:
+                        Console.WriteLine("Invalid option!");
+                        break;
+                }
+            }
+        }
+
+        static void DispatchMenu(User user)
+        {
+            while (true)
+            {
+                Console.WriteLine("\n1. Assign Orders\n2. Update Customer Status\n3. Logout");
+                Console.Write("Select an option: ");
+                var choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        AssignOrders();
+                        break;
+                    case "2":
+                        UpdateCustomerStatus();
+                        break;
+                    case "3":
+                        return;
+                    default:
+                        Console.WriteLine("Invalid option!");
+                        break;
+                }
+            }
+        }
+
+        static void ViewMenu()
+        {
+            Console.WriteLine("\nRestaurant Menu:");
+            foreach (var item in menu)
+            {
+                Console.WriteLine($"{item.Name} ({item.Category}) - ${item.Price}");
+            }
+        }
+
+        static void PlaceOrder(string customerName)
+        {
+            var orderItems = new List<MenuItem>();
+            while (true)
+            {
+                Console.WriteLine("\nEnter the name of the menu item to add (or type 'done' to finish):");
+                var itemName = Console.ReadLine();
+                if (itemName.ToLower() == "done") break;
+
+                var item = menu.Find(i => i.Name.Equals(itemName, StringComparison.OrdinalIgnoreCase));
+                if (item != null)
+                {
+                    orderItems.Add(item);
+                    Console.WriteLine($"{item.Name} added to the order.");
+                }
+                else
+                {
+                    Console.WriteLine("Item not found.");
+                }
+            }
+
+            orders.Add(new Order
+            {
+                OrderId = orderIdCounter++,
+                CustomerName = customerName,
+                Items = orderItems,
+                Status = "Pending",
+                DeliveryPersonnel = "Unassigned"
+            });
+
+            Console.WriteLine("Order placed successfully!");
+        }
+
+        static void TrackOrder(string customerName)
+        {
+            var customerOrders = orders.FindAll(o => o.CustomerName == customerName);
+            Console.WriteLine("\nYour Orders:");
+            foreach (var order in customerOrders)
+            {
+                Console.WriteLine($"\nOrder ID: {order.OrderId}, Status: {order.Status}, Delivery Personnel: {order.DeliveryPersonnel}");
+            }
+        }
+
+        static void SetAvailability(string riderName)
+        {
+            Console.WriteLine($"\nRider {riderName} is now available.");
+        }
+
+        static void ViewAssignedOrders(string riderName)
+        {
+            var assignedOrders = orders.FindAll(o => o.DeliveryPersonnel == riderName);
+            Console.WriteLine("\nAssigned Orders:");
+            foreach (var order in assignedOrders)
+            {
+                Console.WriteLine($"Order ID: {order.OrderId}, Customer: {order.CustomerName}, Status: {order.Status}");
+            }
+        }
+
+        static void AssignOrders()
+        {
+            Console.Write("Enter Order ID to assign: ");
+            var orderId = int.Parse(Console.ReadLine());
+            Console.Write("Enter Rider's name: ");
+            var riderName = Console.ReadLine();
+
+            var order = orders.Find(o => o.OrderId == orderId);
+            if (order != null)
+            {
+                order.DeliveryPersonnel = riderName;
+                order.Status = "Preparing";
+                Console.WriteLine($"Order ID {orderId} assigned to {riderName}.");
+            }
+            else
+            {
+                Console.WriteLine("Order not found.");
+            }
+        }
+
+        static void UpdateCustomerStatus()
+        {
+            Console.Write("Enter Order ID to update status: ");
+            var orderId = int.Parse(Console.ReadLine());
+            Console.Write("Enter new status (Pending/Preparing/Delivered): ");
+            var status = Console.ReadLine();
+
+            var order = orders.Find(o => o.OrderId == orderId);
+            if (order != null)
+            {
+                order.Status = status;
+                Console.WriteLine($"Order ID {orderId} status updated to {status}.");
+            }
+            else
+            {
+                Console.WriteLine("Order not found.");
+            }
+        }
+    }
+}
