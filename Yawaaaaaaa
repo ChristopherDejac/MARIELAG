@@ -1,0 +1,237 @@
+ using System;
+using MySql.Data.MySqlClient;
+using System.Collections.Generic;
+
+namespace FoodDeliveryOrderManager
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("**********************************************************");
+                Console.WriteLine("             Food Delivery Order Manager");
+                Console.WriteLine("**********************************************************");
+                Console.WriteLine("1. Register User");
+                Console.WriteLine("2. Login User");
+                Console.WriteLine("3. Exit");
+                Console.WriteLine("**********************************************************");
+                Console.Write("Select an option: ");
+                string option = Console.ReadLine();
+
+                if (option == "1")
+                {
+                    RegisterUser();
+                }
+                else if (option == "2")
+                {
+                    LoginUser();
+                }
+                else if (option == "3")
+                {
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid option, try again.");
+                    Console.ReadKey();
+                }
+            }
+        }
+
+        private static MySqlConnection GetConnection()
+        {
+            string connectionString = "Server=localhost;Database=FoodDeliveryDB;User=root;Password=yourpassword;";
+            return new MySqlConnection(connectionString);
+        }
+
+        static void RegisterUser()
+        {
+            Console.Clear();
+            Console.WriteLine("**********************************************************");
+            Console.WriteLine("               User Registration");
+            Console.WriteLine("**********************************************************");
+            Console.Write("Enter Username: ");
+            string username = Console.ReadLine();
+            Console.Write("Enter Password: ");
+            string password = Console.ReadLine();
+            Console.Write("Enter Gmail Address: ");
+            string gmail = Console.ReadLine();
+            Console.Write("Enter Role (Customer, Rider, Assembler): ");
+            string role = Console.ReadLine();
+
+            string contact = string.Empty;
+            string riderName = string.Empty;
+
+            if (role == "Rider")
+            {
+                Console.Write("Enter Rider's Name: ");
+                riderName = Console.ReadLine();
+                Console.Write("Enter Rider's Contact Number: ");
+                contact = Console.ReadLine();
+            }
+
+            if (role != "Customer" && role != "Rider" && role != "Assembler")
+            {
+                Console.WriteLine("Invalid role. Registration failed.");
+                return;
+            }
+
+            // Insert user data into MySQL database
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+                string query = "INSERT INTO users (Username, Password, Gmail, Role, Contact, RiderName) VALUES (@Username, @Password, @Gmail, @Role, @Contact, @RiderName)";
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@Username", username);
+                cmd.Parameters.AddWithValue("@Password", password);
+                cmd.Parameters.AddWithValue("@Gmail", gmail);
+                cmd.Parameters.AddWithValue("@Role", role);
+                cmd.Parameters.AddWithValue("@Contact", contact);
+                cmd.Parameters.AddWithValue("@RiderName", riderName);
+
+                cmd.ExecuteNonQuery();
+            }
+
+            Console.WriteLine("Registration successful!");
+            Console.WriteLine("Press any key to go back to the main menu.");
+            Console.ReadKey();
+        }
+
+        static void LoginUser()
+        {
+            Console.Clear();
+            Console.WriteLine("**********************************************************");
+            Console.WriteLine("                  User Login");
+            Console.WriteLine("**********************************************************");
+            Console.Write("Enter Username: ");
+            string username = Console.ReadLine();
+            Console.Write("Enter Password: ");
+            string password = Console.ReadLine();
+
+            User user = null;
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+                string query = "SELECT * FROM users WHERE Username = @Username AND Password = @Password";
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@Username", username);
+                cmd.Parameters.AddWithValue("@Password", password);
+
+                MySqlDataReader reader = cmd.ExecuteReader();
+                if (reader.Read())
+                {
+                    user = new User
+                    {
+                        UserId = reader.GetInt32("UserId"),
+                        Username = reader.GetString("Username"),
+                        Password = reader.GetString("Password"),
+                        Gmail = reader.GetString("Gmail"),
+                        Role = reader.GetString("Role"),
+                        Contact = reader.GetString("Contact"),
+                        RiderName = reader.GetString("RiderName")
+                    };
+                }
+            }
+
+            if (user != null)
+            {
+                Console.WriteLine($"Login successful! Welcome, {user.Role} {user.Username} ({user.Gmail})");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
+                // Handle Role-based Navigation (Customer, Rider, Assembler)
+            }
+            else
+            {
+                Console.WriteLine("Invalid credentials. Please try again.");
+                Console.WriteLine("Press any key to try again.");
+                Console.ReadKey();
+            }
+        }
+
+        static void SeedData()
+        {
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+
+                // Seed users
+                string userQuery = "INSERT INTO users (Username, Password, Gmail, Role) VALUES " +
+                                   "('admin', 'admin', 'admin@fooddelivery.com', 'Assembler')," +
+                                   "('rider1', 'rider1', 'rider1@fooddelivery.com', 'Rider')," +
+                                   "('customer1', 'customer1', 'customer1@fooddelivery.com', 'Customer')";
+                MySqlCommand cmd = new MySqlCommand(userQuery, conn);
+                cmd.ExecuteNonQuery();
+
+                // Seed menu items
+                string menuQuery = "INSERT INTO menu_items (Name, Price) VALUES " +
+                                   "('Burger', 5.99), " +
+                                   "('Pizza', 8.99), " +
+                                   "('Pasta', 7.49), " +
+                                   "('Fries', 2.99)";
+                cmd = new MySqlCommand(menuQuery, conn);
+                cmd.ExecuteNonQuery();
+            }
+        }
+
+        static void CreateOrder()
+        {
+            Console.Clear();
+            Console.WriteLine("**********************************************************");
+            Console.WriteLine("               Create New Order");
+            Console.WriteLine("**********************************************************");
+            Console.Write("Enter Customer Name: ");
+            string customerName = Console.ReadLine();
+            Console.Write("Enter Customer Contact: ");
+            string customerContact = Console.ReadLine();
+            Console.Write("Enter Menu Item: ");
+            string menuItem = Console.ReadLine();
+            Console.Write("Enter Delivery Location: ");
+            string location = Console.ReadLine();
+            Console.Write("Enter Price: ");
+            decimal price = decimal.Parse(Console.ReadLine());
+
+            // Assign a rider (you may need to add more logic to select a rider)
+            string riderName = "Assigned Rider"; // Example, you can modify this.
+            string riderContact = "Rider Contact"; // Example.
+
+            string status = "Pending"; // New order status.
+
+            using (var conn = GetConnection())
+            {
+                conn.Open();
+                string query = "INSERT INTO orders (CustomerName, CustomerContact, MenuItem, Status, RiderName, RiderContact, Price, Location) VALUES " +
+                               "(@CustomerName, @CustomerContact, @MenuItem, @Status, @RiderName, @RiderContact, @Price, @Location)";
+                MySqlCommand cmd = new MySqlCommand(query, conn);
+                cmd.Parameters.AddWithValue("@CustomerName", customerName);
+                cmd.Parameters.AddWithValue("@CustomerContact", customerContact);
+                cmd.Parameters.AddWithValue("@MenuItem", menuItem);
+                cmd.Parameters.AddWithValue("@Status", status);
+                cmd.Parameters.AddWithValue("@RiderName", riderName);
+                cmd.Parameters.AddWithValue("@RiderContact", riderContact);
+                cmd.Parameters.AddWithValue("@Price", price);
+                cmd.Parameters.AddWithValue("@Location", location);
+
+                cmd.ExecuteNonQuery();
+            }
+
+            Console.WriteLine("Order created successfully!");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+        }
+
+        // Create a basic User class
+        class User
+        {
+            public int UserId { get; set; }
+            public string Username { get; set; }
+            public string Password { get; set; }
+            public string Gmail { get; set; }
+            public string Role { get; set; }
+            public string Contact { get; set; }
+            public string RiderName { get; set; }
+        }
+    }
+}
