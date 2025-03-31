@@ -1,0 +1,10 @@
+INSERT INTO users (Username, Password, Gmail, Role) VALUES
+('admin', 'admin', 'admin@fooddelivery.com', 'Assembler'),
+('rider1', 'rider1', 'rider1@fooddelivery.com', 'Rider'),
+('customer1', 'customer1', 'customer1@fooddelivery.com', 'Customer');
+
+INSERT INTO menu_items (Name, Price) VALUES
+('Burger', 5.99),
+('Pizza', 8.99),
+('Pasta', 7.49),
+('Fries', 2.99);
