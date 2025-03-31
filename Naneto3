@@ -1,0 +1,545 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace FoodDeliveryOrderManager
+{
+    class Program
+    {
+        static List<User> users = new List<User>();
+        static List<Order> orders = new List<Order>();
+        static List<MenuItem> menu = new List<MenuItem>
+        {
+            new MenuItem { Name = "Burger", Price = 5.99 },
+            new MenuItem { Name = "Pizza", Price = 8.99 },
+            new MenuItem { Name = "Pasta", Price = 7.49 },
+            new MenuItem { Name = "Fries", Price = 2.99 }
+        };
+
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Welcome to Food Delivery Order Manager!");
+            SeedData();  // Register default users
+
+            while (true)
+            {
+                ShowMainMenu(); // Show the main menu
+            }
+        }
+
+        static void ShowMainMenu()
+        {
+            Console.Clear();
+            Console.WriteLine("**********************************************************");
+            Console.WriteLine("         Welcome to the Food Delivery Order Manager");
+            Console.WriteLine("**********************************************************");
+            Console.WriteLine("1. Register");
+            Console.WriteLine("2. Login");
+            Console.WriteLine("3. Exit");
+            Console.WriteLine("**********************************************************");
+            Console.Write("Please choose an option: ");
+            int choice = int.Parse(Console.ReadLine());
+
+            switch (choice)
+            {
+                case 1:
+                    RegisterUser();
+                    break;
+                case 2:
+                    LoginUser();
+                    break;
+                case 3:
+                    Console.WriteLine("Exiting... Goodbye!");
+                    Environment.Exit(0); // Exit the application
+                    break;
+                default:
+                    Console.WriteLine("Invalid choice. Please try again.");
+                    break;
+            }
+        }
+
+        static void RegisterUser()
+        {
+            Console.Clear();
+            Console.WriteLine("**********************************************************");
+            Console.WriteLine("               User Registration");
+            Console.WriteLine("**********************************************************");
+            Console.Write("Enter Username: ");
+            string username = Console.ReadLine();
+            Console.Write("Enter Password: ");
+            string password = Console.ReadLine();
+            Console.Write("Enter Gmail Address: ");
+            string gmail = Console.ReadLine();
+            Console.Write("Enter Role (Customer, Rider, Assembler): ");
+            string role = Console.ReadLine();
+
+            string contact = string.Empty;
+            string riderName = string.Empty;
+
+            if (role == "Rider")
+            {
+                Console.Write("Enter Rider's Name: ");
+                riderName = Console.ReadLine();
+                Console.Write("Enter Rider's Contact Number: ");
+                contact = Console.ReadLine();
+            }
+
+            if (role != "Customer" && role != "Rider" && role != "Assembler")
+            {
+                Console.WriteLine("Invalid role. Registration failed.");
+                return;
+            }
+
+            User user = new User
+            {
+                UserId = users.Count + 1,
+                Username = username,
+                Password = password,
+                Gmail = gmail,
+                Role = role,
+                Contact = contact,
+                RiderName = riderName
+            };
+            users.Add(user);
+            Console.WriteLine("Registration successful!");
+            Console.WriteLine("Press any key to go back to the main menu.");
+            Console.ReadKey();
+        }
+
+        static void LoginUser()
+        {
+            Console.Clear();
+            Console.WriteLine("**********************************************************");
+            Console.WriteLine("                  User Login");
+            Console.WriteLine("**********************************************************");
+            Console.Write("Enter Username: ");
+            string username = Console.ReadLine();
+            Console.Write("Enter Password: ");
+            string password = Console.ReadLine();
+
+            User user = users.Find(u => u.Username == username && u.Password == password);
+            if (user != null)
+            {
+                Console.WriteLine($"Login successful! Welcome, {user.Role} {user.Username} ({user.Gmail})");
+                Console.WriteLine("Press any key to continue...");
+                Console.ReadKey();
+                switch (user.Role)
+                {
+                    case "Customer":
+                        CustomerMenu(user);
+                        break;
+                    case "Rider":
+                        RiderMenu(user);
+                        break;
+                    case "Assembler":
+                        AssemblerMenu();
+                        break;
+                }
+            }
+            else
+            {
+                Console.WriteLine("Invalid credentials. Please try again.");
+                Console.WriteLine("Press any key to try again.");
+                Console.ReadKey();
+            }
+        }
+
+        static void CustomerMenu(User customer)
+        {
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("**********************************************************");
+                Console.WriteLine("                  Customer Menu");
+                Console.WriteLine("**********************************************************");
+                Console.WriteLine("1. View Menu & Order");
+                Console.WriteLine("2. View Your Orders");
+                Console.WriteLine("3. Logout");
+                Console.WriteLine("**********************************************************");
+                Console.Write("Please choose an option: ");
+                int choice = int.Parse(Console.ReadLine());
+
+                switch (choice)
+                {
+                    case 1:
+                        ViewMenuAndOrder(customer);
+                        break;
+                    case 2:
+                        ViewCustomerOrders(customer);
+                        break;
+                    case 3:
+                        return; // Logout and go back to main menu
+                    default:
+                        Console.WriteLine("Invalid choice. Please try again.");
+                        break;
+                }
+            }
+        }
+
+        static void ViewMenuAndOrder(User customer)
+        {
+            Console.Clear();
+            Console.WriteLine("**********************************************************");
+            Console.WriteLine("                   Menu");
+            Console.WriteLine("**********************************************************");
+            for (int i = 0; i < menu.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {menu[i].Name} - ₱{menu[i].Price:F2}");
+            }
+
+            List<MenuItem> orderItems = new List<MenuItem>(); // List to store items the customer wants to order
+
+            while (true)
+            {
+                Console.Write("Choose an item to order (or type 0 to finish): ");
+                int itemChoice = int.Parse(Console.ReadLine());
+
+                if (itemChoice == 0) break;
+
+                if (itemChoice < 1 || itemChoice > menu.Count)
+                {
+                    Console.WriteLine("Invalid choice. Please try again.");
+                    continue;
+                }
+
+                MenuItem selectedItem = menu[itemChoice - 1];
+                orderItems.Add(selectedItem);
+                Console.WriteLine($"{selectedItem.Name} added to your order.");
+            }
+
+            // Ask the customer for their location and contact
+            Console.Write("Enter your location: ");
+            string location = Console.ReadLine();
+
+            Console.Write("Enter your contact number: ");
+            string contact = Console.ReadLine();
+
+            double totalBill = 0;
+            foreach (var item in orderItems)
+            {
+                Order newOrder = new Order
+                {
+                    OrderId = orders.Count + 1,
+                    CustomerName = customer.Username,
+                    CustomerContact = contact,  // Store customer contact
+                    MenuItem = item.Name,
+                    Status = "Pending",  // Order is pending until assigned to a rider
+                    AssignedRiderId = -1, // Rider assignment will be done later
+                    RiderName = string.Empty, // Initially empty until assigned
+                    RiderContact = string.Empty, // Initially empty until assigned
+                    Price = item.Price,
+                    Location = location  // Save the location for the order
+                };
+                totalBill += item.Price;
+                orders.Add(newOrder);
+                Console.WriteLine($"Order placed successfully! {item.Name} will be prepared.");
+            }
+
+            Console.WriteLine($"\nYour total bill is: ₱{totalBill:F2}");
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+        }
+
+        static void ViewCustomerOrders(User customer)
+        {
+            Console.Clear();
+            Console.WriteLine("**********************************************************");
+            Console.WriteLine("                  Your Orders");
+            Console.WriteLine("**********************************************************");
+
+            bool hasPendingOrAcceptedOrders = false;
+
+            foreach (var order in orders)
+            {
+                if (order.CustomerName == customer.Username)
+                {
+                    if (order.Status == "Pending")
+                    {
+                        Console.WriteLine($"Order ID: {order.OrderId}, Item: {order.MenuItem}, Status: {order.Status}, Price: ₱{order.Price:F2}");
+                        Console.WriteLine($"Location: {order.Location}");
+                    }
+                    else if (order.Status == "Accepted by Rider")
+                    {
+                        Console.WriteLine($"Order ID: {order.OrderId}, Item: {order.MenuItem}, Status: {order.Status}, Price: ₱{order.Price:F2}");
+                        Console.WriteLine($"Location: {order.Location}");
+                        Console.WriteLine($"Rider: {order.RiderName}");
+                        Console.WriteLine($"Rider Contact: {order.RiderContact}");
+                    }
+                    hasPendingOrAcceptedOrders = true;
+                }
+            }
+
+            if (!hasPendingOrAcceptedOrders)
+            {
+                Console.WriteLine("You have no orders to display.");
+            }
+
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+        }
+
+        static void RiderMenu(User rider)
+        {
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("**********************************************************");
+                Console.WriteLine("                   Rider Menu");
+                Console.WriteLine("**********************************************************");
+                Console.WriteLine("1. View Assigned Orders");
+                Console.WriteLine("2. Accept/Decline Order");
+                Console.WriteLine("3. Logout");
+                Console.WriteLine("**********************************************************");
+                Console.Write("Please choose an option: ");
+                int choice = int.Parse(Console.ReadLine());
+
+                switch (choice)
+                {
+                    case 1:
+                        ViewRiderOrders(rider);
+                        break;
+                    case 2:
+                        AcceptOrDeclineOrder(rider);
+                        break;
+                    case 3:
+                        return; // Logout and go back to main menu
+                    default:
+                        Console.WriteLine("Invalid choice. Please try again.");
+                        break;
+                }
+            }
+        }
+
+        static void ViewRiderOrders(User rider)
+        {
+            Console.Clear();
+            Console.WriteLine("**********************************************************");
+            Console.WriteLine("                 Assigned Orders");
+            Console.WriteLine("**********************************************************");
+            foreach (var order in orders)
+            {
+                if (order.AssignedRiderId == rider.UserId)
+                {
+                    Console.WriteLine($"Order ID: {order.OrderId}, Item: {order.MenuItem}, Status: {order.Status}");
+                    Console.WriteLine($"Location: {order.Location}");
+                    Console.WriteLine($"Customer Name: {order.CustomerName}");
+                    Console.WriteLine($"Customer Contact: {order.CustomerContact}");
+                }
+            }
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+        }
+
+        static void AcceptOrDeclineOrder(User rider)
+        {
+            Console.Clear();
+            Console.Write("Enter Order ID to accept/decline: ");
+            int orderId = int.Parse(Console.ReadLine());
+            Order order = orders.Find(o => o.OrderId == orderId && o.AssignedRiderId == -1); // Only pending orders
+
+            if (order != null)
+            {
+                Console.Write("Accept or Decline? (Type A for Accept, D for Decline): ");
+                string decision = Console.ReadLine();
+                if (decision == "A" || decision == "a")
+                {
+                    order.Status = "Accepted by Rider";
+                    order.AssignedRiderId = rider.UserId; // Assign the rider ID to the order
+                    order.RiderName = rider.RiderName; // Save rider's name
+                    order.RiderContact = rider.Contact; // Save rider's contact info
+                    Console.WriteLine("Order accepted!");
+                }
+                else if (decision == "D" || decision == "d")
+                {
+                    order.Status = "Declined by Rider";
+                    Console.WriteLine("Order declined.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No such order assigned to you.");
+            }
+
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+        }
+
+        static void AssemblerMenu()
+        {
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("**********************************************************");
+                Console.WriteLine("                  Assembler Menu");
+                Console.WriteLine("**********************************************************");
+                Console.WriteLine("1. View All Orders");
+                Console.WriteLine("2. Update Order Status");
+                Console.WriteLine("3. Assign Rider to Order");
+                Console.WriteLine("4. Delete Order");  // New option to delete an order
+                Console.WriteLine("5. Logout");
+                Console.WriteLine("**********************************************************");
+                Console.Write("Please choose an option: ");
+                int choice = int.Parse(Console.ReadLine());
+
+                switch (choice)
+                {
+                    case 1:
+                        ViewAllOrders();
+                        break;
+                    case 2:
+                        UpdateOrderStatus();
+                        break;
+                    case 3:
+                        AssignRiderToOrder();
+                        break;
+                    case 4:
+                        DeleteOrder();  // Call the new DeleteOrder method
+                        break;
+                    case 5:
+                        return; // Logout and go back to main menu
+                    default:
+                        Console.WriteLine("Invalid choice. Please try again.");
+                        break;
+                }
+            }
+        }
+
+        static void ViewAllOrders()
+        {
+            Console.Clear();
+            Console.WriteLine("**********************************************************");
+            Console.WriteLine("                   All Orders");
+            Console.WriteLine("**********************************************************");
+            foreach (var order in orders)
+            {
+                Console.WriteLine($"Order ID: {order.OrderId}, Item: {order.MenuItem}, Status: {order.Status}, Price: ₱{order.Price:F2}");
+                Console.WriteLine($"Location: {order.Location}");
+                Console.WriteLine($"Customer: {order.CustomerName} | {order.CustomerContact}");
+            }
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+        }
+
+        static void UpdateOrderStatus()
+        {
+            Console.Clear();
+            Console.Write("Enter Order ID to update: ");
+            int orderId = int.Parse(Console.ReadLine());
+            Order order = orders.Find(o => o.OrderId == orderId);
+
+            if (order != null)
+            {
+                Console.WriteLine($"Order ID: {order.OrderId}, Item: {order.MenuItem}, Current Status: {order.Status}");
+                Console.WriteLine("Enter new status: ");
+                order.Status = Console.ReadLine();
+                Console.WriteLine("Order status updated.");
+            }
+            else
+            {
+                Console.WriteLine("Order not found.");
+            }
+
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+        }
+
+        static void AssignRiderToOrder()
+        {
+            Console.Clear();
+            Console.Write("Enter Order ID to assign a rider: ");
+            int orderId = int.Parse(Console.ReadLine());
+            Order order = orders.Find(o => o.OrderId == orderId);
+
+            if (order != null && order.Status == "Pending")
+            {
+                Console.Write("Enter Rider's Name: ");
+                string riderName = Console.ReadLine();
+                Console.Write("Enter Rider's Contact: ");
+                string riderContact = Console.ReadLine();
+
+                order.Status = "Accepted by Rider";
+                order.RiderName = riderName;
+                order.RiderContact = riderContact;
+                Console.WriteLine("Rider assigned successfully.");
+            }
+            else
+            {
+                Console.WriteLine("Invalid order or order already has a rider assigned.");
+            }
+
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+        }
+
+        static void DeleteOrder()
+        {
+            Console.Clear();
+            Console.Write("Enter Order ID to delete: ");
+            int orderId = int.Parse(Console.ReadLine());
+
+            Order order = orders.Find(o => o.OrderId == orderId);
+
+            if (order != null)
+            {
+                Console.WriteLine($"Are you sure you want to delete Order ID: {orderId} (Item: {order.MenuItem})? (Y/N)");
+                string confirmation = Console.ReadLine();
+
+                if (confirmation.ToUpper() == "Y")
+                {
+                    orders.Remove(order);  // Delete the order from the orders list
+                    Console.WriteLine("Order deleted successfully!");
+                }
+                else
+                {
+                    Console.WriteLine("Order deletion canceled.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Order not found.");
+            }
+
+            Console.WriteLine("Press any key to continue...");
+            Console.ReadKey();
+        }
+
+        static void SeedData()
+        {
+            // Seed some initial users (you can modify this as per your requirements)
+            users.Add(new User { UserId = 1, Username = "admin", Password = "admin", Role = "Assembler", Gmail = "admin@fooddelivery.com" });
+            users.Add(new User { UserId = 2, Username = "rider1", Password = "rider1", Role = "Rider", Gmail = "rider1@fooddelivery.com", Contact = "1234567890", RiderName = "John Doe" });
+            users.Add(new User { UserId = 3, Username = "customer1", Password = "customer1", Role = "Customer", Gmail = "customer1@fooddelivery.com" });
+        }
+    }
+
+    public class User
+    {
+        public int UserId { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+        public string Gmail { get; set; }
+        public string Role { get; set; }
+        public string Contact { get; set; }
+        public string RiderName { get; set; }
+    }
+
+    public class Order
+    {
+        public int OrderId { get; set; }
+        public string CustomerName { get; set; }
+        public string CustomerContact { get; set; }
+        public string MenuItem { get; set; }
+        public string Status { get; set; }
+        public int AssignedRiderId { get; set; }
+        public string RiderName { get; set; }
+        public string RiderContact { get; set; }
+        public double Price { get; set; }
+        public string Location { get; set; }
+    }
+
+    public class MenuItem
+    {
+        public string Name { get; set; }
+        public double Price { get; set; }
+    }
+}
